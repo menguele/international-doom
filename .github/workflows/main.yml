@@ -16,39 +16,37 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Cache vcpkg
+      - name: Cache vcpkg artifacts
         uses: actions/cache@v4
         with:
           path: |
-            vcpkg/installed
-            vcpkg/buildtrees
-            vcpkg/downloads
+            vcpkg-cache/installed
+            vcpkg-cache/buildtrees
+            vcpkg-cache/downloads
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-${{ runner.os }}-
 
-      - name: Remove old vcpkg dir (if cache restored)
-        shell: bash
-        run: |
-          if [ -d "vcpkg" ]; then
-            rm -rf vcpkg
-          fi
-
-      - name: Get latest VCPKG commit
+      - name: Clone vcpkg
         shell: bash
         run: |
           git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          export LATEST_COMMIT=$(git rev-parse HEAD)
-          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
 
-      - name: Install vcpkg
+      - name: Bootstrap vcpkg
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
 
+      - name: Set VCPKG environment for cache
+        shell: bash
+        run: |
+          echo "VCPKG_DOWNLOADS=${{ github.workspace }}/vcpkg-cache/downloads" >> $GITHUB_ENV
+
       - name: Install Dependencies with vcpkg
         run: |
-          .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets
+          .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets \
+            --x-install-root=${{ github.workspace }}/vcpkg-cache/installed \
+            --x-buildtrees-root=${{ github.workspace }}/vcpkg-cache/buildtrees \
+            --x-packages-root=${{ github.workspace }}/vcpkg-cache/packages
 
       - name: Configure CMake
         run: |
