@@ -12,20 +12,19 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-archives
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Cache vcpkg artifacts
+      - name: Cache vcpkg binary archives
         uses: actions/cache@v4
         with:
-          path: |
-            vcpkg/installed
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          path: vcpkg-archives
+          key: vcpkg-archives-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ runner.os }}-
+            vcpkg-archives-${{ runner.os }}-
 
       - name: Remove vcpkg dir before cloning
         shell: pwsh
