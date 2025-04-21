@@ -27,6 +27,13 @@ jobs:
           restore-keys: |
             vcpkg-${{ runner.os }}-
 
+      - name: Remove old vcpkg dir (if cache restored)
+        shell: bash
+        run: |
+          if [ -d "vcpkg" ]; then
+            rm -rf vcpkg
+          fi
+
       - name: Get latest VCPKG commit
         shell: bash
         run: |
