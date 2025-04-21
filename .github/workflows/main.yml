@@ -33,8 +33,7 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
 
       - name: Bootstrap vcpkg
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
+        run: .\vcpkg\bootstrap-vcpkg.bat
 
       - name: Set VCPKG environment for cache
         shell: bash
@@ -44,7 +43,9 @@ jobs:
       - name: Install Dependencies with vcpkg
         shell: bash
         run: |
-          .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets \
+          ./vcpkg/vcpkg.exe install \
+            --triplet x64-windows-static-release \
+            --overlay-triplets=cmake/triplets \
             --x-install-root=${{ github.workspace }}/vcpkg-cache/installed \
             --x-buildtrees-root=${{ github.workspace }}/vcpkg-cache/buildtrees \
             --x-packages-root=${{ github.workspace }}/vcpkg-cache/packages
