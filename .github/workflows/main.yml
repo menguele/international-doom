@@ -30,12 +30,9 @@ jobs:
         shell: pwsh
         run: if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
 
-      - name: Clone vcpkg at stable release
+      - name: Clone vcpkg (latest)
         shell: bash
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          git checkout latest
+        run: git clone https://github.com/microsoft/vcpkg.git
 
       - name: Bootstrap vcpkg
         run: .\vcpkg\bootstrap-vcpkg.bat
