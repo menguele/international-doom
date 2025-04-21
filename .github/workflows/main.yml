@@ -28,7 +28,7 @@ jobs:
 
       - name: Remove vcpkg dir before cloning
         shell: pwsh
-        run: Remove-Item -Recurse -Force vcpkg
+        run: if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
 
       - name: Clone vcpkg at stable release
         shell: bash
