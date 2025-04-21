@@ -42,6 +42,7 @@ jobs:
           echo "VCPKG_DOWNLOADS=${{ github.workspace }}/vcpkg-cache/downloads" >> $GITHUB_ENV
 
       - name: Install Dependencies with vcpkg
+        shell: bash
         run: |
           .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets \
             --x-install-root=${{ github.workspace }}/vcpkg-cache/installed \
