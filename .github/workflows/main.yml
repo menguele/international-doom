@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - cache
   pull_request:
     branches:
       - main
@@ -17,12 +18,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
+      - name: Cache vcpkg
+        uses: actions/cache@v4
         with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+          path: |
+            vcpkg/installed
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
 
       - name: Get latest VCPKG commit
         shell: bash
@@ -36,18 +41,9 @@ jobs:
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
 
-      - name: Remove vcpkg.json for classic mode
-        shell: bash
-        run: |
-          if [ -f "vcpkg.json" ]; then
-            rm "vcpkg.json"
-          fi
-
       - name: Install Dependencies with vcpkg
         run: |
-          .\vcpkg\vcpkg.exe install sdl2 sdl2-mixer[libflac,libmodplug,mpg123,opusfile] sdl2-net libsamplerate fluidsynth `
-          --triplet x64-windows-static-release `
-          --overlay-triplets=cmake/triplets
+          .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets
 
       - name: Configure CMake
         run: |
