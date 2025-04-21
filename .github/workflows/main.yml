@@ -20,9 +20,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            vcpkg-cache/installed
-            vcpkg-cache/buildtrees
-            vcpkg-cache/downloads
+            vcpkg/installed
+            vcpkg/buildtrees
+            vcpkg/downloads
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-${{ runner.os }}-
@@ -35,20 +35,13 @@ jobs:
       - name: Bootstrap vcpkg
         run: .\vcpkg\bootstrap-vcpkg.bat
 
-      - name: Set VCPKG environment for cache
+      - name: Set VCPKG_DOWNLOADS env variable
         shell: bash
         run: |
-          echo "VCPKG_DOWNLOADS=${{ github.workspace }}/vcpkg-cache/downloads" >> $GITHUB_ENV
+          echo "VCPKG_DOWNLOADS=${{ github.workspace }}/vcpkg/downloads" >> $GITHUB_ENV
 
       - name: Install Dependencies with vcpkg
-        shell: bash
-        run: |
-          ./vcpkg/vcpkg.exe install \
-            --triplet x64-windows-static-release \
-            --overlay-triplets=cmake/triplets \
-            --x-install-root=${{ github.workspace }}/vcpkg-cache/installed \
-            --x-buildtrees-root=${{ github.workspace }}/vcpkg-cache/buildtrees \
-            --x-packages-root=${{ github.workspace }}/vcpkg-cache/packages
+        run: .\vcpkg\vcpkg.exe install --triplet x64-windows-static-release --overlay-triplets=cmake/triplets
 
       - name: Configure CMake
         run: |
